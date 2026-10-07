@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>고양 여행 성향 테스트</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7ff;
+      color: #333;
+    }
+
+    .app {
+      width: 90%;
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 35px 30px;
+      border-radius: 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header .emoji {
+      font-size: 45px;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin: 12px 0 8px;
+    }
+
+    .subtitle {
+      color: #777;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .progress {
+      width: 100%;
+      height: 8px;
+      background: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    #progressBar {
+      width: 20%;
+      height: 100%;
+      background: #9bbcff;
+      transition: 0.3s;
+    }
+
+    #questionNumber {
+      color: #82a9ee;
+      font-weight: bold;
+    }
+
+    #question {
+      font-size: 22px;
+      line-height: 1.5;
+      margin: 25px 0;
+    }
+
+    .answer {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      margin: 12px 0;
+      border: 2px solid #eeeeee;
+      border-radius: 15px;
+      background: white;
+      text-align: left;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .answer.selected {
+      border-color: #8db7ff;
+      background: #eef5ff;
+    }
+
+    #nextBtn,
+    #restartBtn {
+      width: 100%;
+      padding: 16px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 15px;
+      background: #8db7ff;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #nextBtn:disabled {
+      background: #ddd;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #result {
+      text-align: center;
+    }
+
+    .result-label {
+      color: #888;
+    }
+
+    #resultTitle {
+      font-size: 28px;
+      margin: 15px 0;
+    }
+
+    #resultText {
+      line-height: 1.7;
+      color: #666;
+    }
+
+    #course {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 18px;
+      background: #f5f8ff;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <div class="header">
+      <div class="emoji">✈️</div>
+
+      <h1>나의 고양 여행 성향은?</h1>
+
+      <p class="subtitle">
+        5개의 질문으로 알아보는<br>
+        나에게 딱 맞는 고양 여행
+      </p>
+    </div>
+
+    <!-- 질문 화면 -->
+    <div id="quiz">
+
+      <div class="progress">
+        <div id="progressBar"></div>
+      </div>
+
+      <p id="questionNumber">1 / 5</p>
+
+      <h2 id="question"></h2>
+
+      <div id="answers"></div>
+
+      <button id="nextBtn" disabled>
+        다음 질문 →
+      </button>
+
+    </div>
+
+    <!-- 결과 화면 -->
+    <div id="result" class="hidden">
+
+      <p class="result-label">
+  ✨ 당신에게 추천하는 투어는?
+</p>
+
+      <h2 id="resultTitle"></h2>
+
+      <p id="resultText"></p>
+
+      <div id="course"></div>
+
+      <button id="restartBtn">
+        다시 테스트하기
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    const questions = [
+
+      {
+        question: "여행의 마지막 날이라면?",
+        answers: [
+          {
+            text: "A. 카페나 찜질방에서 여유롭게 쉬고 싶다.",
+            type: "A"
+          },
+          {
+            text: "B. 시간이 남는다면 한 곳이라도 더 가고 싶다.",
+            type: "B"
+          }
+        ]
+      },
+
+      {
+        question: "여행 중 가장 기대되는 순간은?",
+        answers: [
+          {
+            text: "A. 쇼핑하거나 맛있는 걸 먹을 때",
+            type: "A"
+          },
+          {
+            text: "B. 새로운 것을 보고 알아가는 순간",
+            type: "B"
+          }
+        ]
+      },
+
+      {
+        question: "나에게 여행이란?",
+        answers: [
+          {
+            text: "A. 일상에서 벗어나 신나게 즐기는 것",
+            type: "A"
+          },
+          {
+            text: "B. 새로운 경험을 통해 시야를 넓히는 것",
+            type: "B"
+          }
+        ]
+      },
+
+      {
+        question: "여행할 때 이동시간은?",
+        answers: [
+          {
+            text: "A. 이동시간은 짧을수록 좋다.",
+            type: "A"
+          },
+          {
+            text: "B. 새로운 곳에 갈 수 있다면 이동시간도 괜찮다.",
+            type: "B"
+          }
+        ]
+      },
+
+      {
+        question: "여행지에서 시간이 남는다면?",
+        answers: [
+          {
+            text: "A. 쇼핑몰이나 상점을 더 구경한다",
+            type: "A"
+          },
+          {
+            text: "B. 다른 장소를 둘러보거나 쉬고 싶다.",
+            type: "B"
+          }
+        ]
+      }
+
+    ];
+
+    let currentQuestion = 0;
+    let scoreA = 0;
+    let scoreB = 0;
+    let selectedAnswer = null;
+
+    const questionElement =
+      document.getElementById("question");
+
+    const questionNumberElement =
+      document.getElementById("questionNumber");
+
+    const answersElement =
+      document.getElementById("answers");
+
+    const nextButton =
+      document.getElementById("nextBtn");
+
+    const progressBar =
+      document.getElementById("progressBar");
+
+    const quizElement =
+      document.getElementById("quiz");
+
+    const resultElement =
+      document.getElementById("result");
+
+    const resultTitle =
+      document.getElementById("resultTitle");
+
+    const resultText =
+      document.getElementById("resultText");
+
+    const courseElement =
+      document.getElementById("course");
+
+    const restartButton =
+      document.getElementById("restartBtn");
+
+    function showQuestion() {
+
+      const current = questions[currentQuestion];
+
+      questionNumberElement.textContent =
+        `${currentQuestion + 1} / 5`;
+
+      questionElement.textContent =
+        current.question;
+
+      progressBar.style.width =
+        `${((currentQuestion + 1) / 5) * 100}%`;
+
+      answersElement.innerHTML = "";
+
+      selectedAnswer = null;
+
+      nextButton.disabled = true;
+
+      current.answers.forEach(answer => {
+
+        const button =
+          document.createElement("button");
+
+        button.className = "answer";
+
+        button.textContent =
+          answer.text;
+
+        button.addEventListener("click", () => {
+
+          document
+            .querySelectorAll(".answer")
+            .forEach(btn => {
+              btn.classList.remove("selected");
+            });
+
+          button.classList.add("selected");
+
+          selectedAnswer =
+            answer.type;
+
+          nextButton.disabled = false;
+
+        });
+
+        answersElement.appendChild(button);
+
+      });
+
+      if (currentQuestion === 4) {
+        nextButton.textContent = "결과 보기 ✨";
+      } else {
+        nextButton.textContent = "다음 질문 →";
+      }
+
+    }
+
+    nextButton.addEventListener("click", () => {
+
+      if (!selectedAnswer) return;
+
+      if (selectedAnswer === "A") {
+        scoreA++;
+      } else {
+        scoreB++;
+      }
+
+      currentQuestion++;
+
+      if (currentQuestion < 5) {
+
+        showQuestion();
+
+      } else {
+
+        showResult();
+
+      }
+
+    });
+
+    function showResult() {
+
+      quizElement.classList.add("hidden");
+
+      resultElement.classList.remove("hidden");
+
+      if (scoreA > scoreB) {
+
+        resultTitle.textContent =
+          "⭐ 스타가 되는 길!";
+
+        resultText.textContent =
+          "신나게 즐기고 다양한 놀거리를 경험하고 싶은 당신!";
+
+        courseElement.innerHTML = `
+          <h3>🎡 놀거리 중심의 고양 투어</h3>
+          <p>
+            쇼핑과 맛있는 음식, 다양한 즐길 거리를
+            중심으로 고양의 재미를 만나보세요.
+          </p>
+        `;
+
+      } else {
+
+        resultTitle.textContent =
+          "🎨 교양있는 당신을 위한 고양 투어";
+
+        resultText.textContent =
+          "문화와 예술을 즐기며 새로운 경험을 하고 싶은 당신!";
+
+        courseElement.innerHTML = `
+          <h3>🎭 문화·예술 중심의 고양 투어</h3>
+          <p>
+            고양의 다양한 문화와 예술 공간을
+            둘러보며 특별한 여행을 즐겨보세요.
+          </p>
+        `;
+
+      }
+
+    }
+
+    restartButton.addEventListener("click", () => {
+
+      currentQuestion = 0;
+      scoreA = 0;
+      scoreB = 0;
+
+      resultElement.classList.add("hidden");
+
+      quizElement.classList.remove("hidden");
+
+      showQuestion();
+
+    });
+
+    showQuestion();
+
+  </script>
+
+</body>
+</html>
